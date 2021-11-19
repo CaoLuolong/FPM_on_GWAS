@@ -191,7 +191,7 @@ def load_data_set():
         A data set: A list of transactions. Each transaction contains several items.
     """
     data_set = []
-    with open('result\\37voxel_set_after_pca-rs.txt', 'r') as file:  # 所有voxel中显著的SNP集合
+    with open('result\\38voxel_set_after_pca-rs.txt', 'r') as file:  # 所有voxel中显著的SNP集合
         data = file.read().split(':')
         for i in range(len(data)-1):
             data1 = data[i].strip(',').split(',')
@@ -207,32 +207,33 @@ if __name__ == "__main__":
 
     data_set = load_data_set()
 
-    # test_para = numpy.zeros((15, 3))
-    # i=0
-    # for min_support in numpy.arange(0.4, 0.81, 0.05):
-    #     start = time.time()
-    #     L, support_data = generate_L(data_set, k=6, min_support = min_support)
-    #     total_time = time.time() - start
-    #     test_para[i,] = [min_support, total_time, len(support_data)]
-    #     i = i+1
-    #     print(i, total_time)
+    test_para = numpy.zeros((15, 3))
+    i=0
+    for min_support in numpy.arange(0.4, 0.81, 0.05):
+        start = time.time()
+        L, support_data = generate_L(data_set, k=1, min_support = min_support)
+        total_time = time.time() - start
+        test_para[i,] = [min_support, total_time, len(support_data)]
+        i = i+1
+        print(i, total_time)
+
+    numpy.savetxt("result/para_time_apriori38k=1.csv",test_para, fmt="%.2f", delimiter=',')
+
+    # start = time.time()
+    # L, support_data = generate_L(data_set, k=4, min_support=0.5)
+    # print(time.time() - start, 'sec')
+    # support_data_sort = sorted(support_data.items(), key=lambda item: item[1], reverse=True)
+    # # for x,v in support_data_sort:
+    # #     print(x, v)
     #
-    # numpy.savetxt("result/para_time_apriori38.csv",test_para, fmt="%.2f", delimiter=',')
+    # for Lk in L:
+    #     print("=" * 50)
+    #     print("frequent " + str(len(list(Lk)[0])) + "-itemsets\t\tsupport")
+    #     print("=" * 50, len(Lk))
+    #     for freq_set in Lk:
+    #         print(freq_set, support_data[freq_set])
+    # print('')
 
-    start = time.time()
-    L, support_data = generate_L(data_set, k=4, min_support=0.5)
-    print(time.time() - start, 'sec')
-    support_data_sort = sorted(support_data.items(), key=lambda item: item[1], reverse=True)
-    # for x,v in support_data_sort:
-    #     print(x, v)
-
-    for Lk in L:
-        print("=" * 50)
-        print("frequent " + str(len(list(Lk)[0])) + "-itemsets\t\tsupport")
-        print("=" * 50, len(Lk))
-        for freq_set in Lk:
-            print(freq_set, support_data[freq_set])
-    print('')
     # big_rules_list = generate_big_rules(L, support_data, min_conf=0.5)
     # big_rules_list_sort = sorted(big_rules_list, key=lambda item: item[2], reverse=True)
     # print("Big Rules")

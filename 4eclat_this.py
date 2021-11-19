@@ -124,7 +124,7 @@ def loadDblpData():
     dataSetDict = {}
     dataSet = []
     count = 0
-    with open('result\\37voxel_set_after_pca-rs.txt', 'r') as file:  # 所有voxel中显著的SNP集合
+    with open('result\\38voxel_set_after_pca-rs.txt', 'r') as file:  # 所有voxel中显著的SNP集合
         data = file.read().split(':')
         for i in range(len(data)-1):
             data1 = data[i].strip(',').split(',')
@@ -145,28 +145,29 @@ if __name__ == '__main__':
     # f = open('result\\49900set0.txt').read().split(":")
     lines = len(dataSet)
 
-    # test_para = numpy.zeros((15, 3))
-    # i=0
-    # for min_support in numpy.arange(0.4, 0.81, 0.05):
-    #     start = time.time()
-    #     freqItems = eclat_zc(dataSet, min_support)  # test_eclat(min_Sup, dataSetDict, dataSet)
-    #     total_time = time.time() - start
-    #     test_para[i,] = [min_support, total_time, len(freqItems)]
-    #     i = i+1
-    #     print(i, total_time)
+    test_para = numpy.zeros((15, 3))
+    i=0
+    for min_support in numpy.arange(0.4, 0.81, 0.05):
+        start = time.time()
+        freqItems = eclat_zc(dataSet, min_support)  # test_eclat(min_Sup, dataSetDict, dataSet)
+        orderedItem = {k: v for k, v in freqItems.items() if (len(k) == 1)}  # find all the 1-item FITs
+        total_time = time.time() - start
+        test_para[i,] = [min_support, total_time, len(orderedItem)]
+        i = i+1
+        print(i, total_time)
+
+    numpy.savetxt("result/para_time_eclat_roi38k=1.csv",test_para, fmt="%.2f", delimiter=',')
+
+    # min_Sup = 0.6
+    # start = time.time()
+    # freqItems = eclat_zc(dataSet, min_Sup) # test_eclat(min_Sup, dataSetDict, dataSet)
+    # print(time.time() - start, 'sec')
+    # freqItems_sort = sorted(freqItems.items(), key=lambda item: item[1], reverse=True)
     #
-    # numpy.savetxt("result/para_time_eclat_roi37.csv",test_para, fmt="%.2f", delimiter=',')
-
-    min_Sup = 0.6
-    start = time.time()
-    freqItems = eclat_zc(dataSet, min_Sup) # test_eclat(min_Sup, dataSetDict, dataSet)
-    print(time.time() - start, 'sec')
-    freqItems_sort = sorted(freqItems.items(), key=lambda item: item[1], reverse=True)
-
-    for set, support in freqItems_sort:
-        print(set, support)
-
-    freqItems[frozenset([])] = 0.9
-    orderedItem = freqItems
-    freqItems = [frozenset(x) for x in orderedItem]
-    generateRules(freqItems, orderedItem)
+    # for set, support in freqItems_sort:
+    #     print(set, support)
+    #
+    # freqItems[frozenset([])] = 0.9
+    # orderedItem = freqItems
+    # freqItems = [frozenset(x) for x in orderedItem]
+    # generateRules(freqItems, orderedItem)

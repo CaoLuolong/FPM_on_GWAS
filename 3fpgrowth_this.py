@@ -193,6 +193,7 @@ def generateRules(freqItemList, supportData, minConf=0.7):
             calcConf(freqSet, H1, supportData, bigRuleList, minConf)
     return bigRuleList
 
+
 def load_data_set():
     """
     Load a sample data set (From Data Mining: Concepts and Techniques, 3th Edition)
@@ -203,11 +204,12 @@ def load_data_set():
     data_set = []
     with open('result\\37voxel_set_after_pca.txt', 'r') as file:  # 所有voxel中显著的SNP集合
         data = file.read().split(':')
-        for i in range(len(data)-1):
+        for i in range(len(data) - 1):
             data1 = data[i].strip(',').split(',')
             data_set.append(data1)
 
     return data_set
+
 
 if __name__ == "__main__":
     import time
@@ -226,27 +228,7 @@ if __name__ == "__main__":
     parsedDat = load_data_set()
 
     test_para = numpy.zeros((15, 3))
-    i=0
-
-    # start = time.time()
-    # n = 0.4*len(parsedDat)  # 用数据集构造FP树，最小支持度10w
-    # initSet = createInitSet(parsedDat)
-    # myFPtree, myHeaderTab = createFPtree(initSet, n)
-    # myFPtree.disp()
-    # # 挖掘FP树
-    # freqItems = []
-    # mineFPtree(myFPtree, myHeaderTab, n, set([]), freqItems)
-    # suppData = calSuppData(myHeaderTab, freqItems, len(parsedDat))
-    # suppData[frozenset([])] = 0.9
-    #
-    # for min_support in numpy.arange(0.4, 0.81, 0.05):
-    #     orderedItem = {k: v for k, v in suppData.items() if v >= min_support}
-    #     total_time = time.time() - start
-    #     test_para[i,] = [min_support, total_time, len(orderedItem)]
-    #     i = i+1
-    #     print(i, total_time)
-    #
-    # numpy.savetxt("result/para_time_fpgrowth38.csv",test_para, fmt="%.2f", delimiter=',')
+    i = 0
 
     start = time.time()
     n = 0.4 * len(parsedDat)  # 用数据集构造FP树，最小支持度10w
@@ -256,25 +238,47 @@ if __name__ == "__main__":
     # 挖掘FP树
     freqItems = []
     mineFPtree(myFPtree, myHeaderTab, n, set([]), freqItems)
-
-    # compute support values of freqItems
     suppData = calSuppData(myHeaderTab, freqItems, len(parsedDat))
     suppData[frozenset([])] = 0.9
-    print(time.time()-start, 'sec')
-    orderedItem = {k:v for k,v in suppData.items() if v >= 0.5}
-    orderedItem_sort = sorted(orderedItem.items(), key=lambda item: item[1], reverse=True)
 
+    for min_support in numpy.arange(0.4, 0.81, 0.05):
+        orderedItem = {k: v for k, v in suppData.items() if
+                       (v >= min_support and len(k) == 1)}  # find all the 1-item FITs
+        # orderedItem = {k: v for k, v in suppData.items() if v >= min_support}  # find all the FITs
+        total_time = time.time() - start
+        test_para[i,] = [min_support, total_time, len(orderedItem)]
+        i = i + 1
+        print(i, total_time)
 
-    snp_name = []
-    with open('result\\ADNI_voxel_AD_IGAP33_VBM.bim', 'r') as file:
-        data = file.read().split('\n')
-        for i in range(len(data)-1):
-            data1 = data[i].split('\t')[1]
-            snp_name.append(data1)
+    numpy.savetxt("result/para_time_fpgrowth37k=1.csv", test_para, fmt="%.2f", delimiter=',')
 
-    for x,v in orderedItem_sort:
-        print(x, v)
-    print("association rules =" * 50)
-    # print({x: v for x, v in orderedItem.items()})
-    freqItems = [frozenset(x) for x in orderedItem]
-    generateRules(freqItems, orderedItem)
+    # start = time.time()
+    # n = 0.4 * len(parsedDat)  # 用数据集构造FP树，最小支持度10w
+    # initSet = createInitSet(parsedDat)
+    # myFPtree, myHeaderTab = createFPtree(initSet, n)
+    # myFPtree.disp()
+    # # 挖掘FP树
+    # freqItems = []
+    # mineFPtree(myFPtree, myHeaderTab, n, set([]), freqItems)
+    #
+    # # compute support values of freqItems
+    # suppData = calSuppData(myHeaderTab, freqItems, len(parsedDat))
+    # suppData[frozenset([])] = 0.9
+    # print(time.time()-start, 'sec')
+    # orderedItem = {k:v for k,v in suppData.items() if v >= 0.5}
+    # orderedItem_sort = sorted(orderedItem.items(), key=lambda item: item[1], reverse=True)
+    #
+    #
+    # snp_name = []
+    # with open('result\\ADNI_voxel_AD_IGAP33_VBM.bim', 'r') as file:
+    #     data = file.read().split('\n')
+    #     for i in range(len(data)-1):
+    #         data1 = data[i].split('\t')[1]
+    #         snp_name.append(data1)
+    #
+    # for x,v in orderedItem_sort:
+    #     print(x, v)
+    # print("association rules =" * 50)
+    # # print({x: v for x, v in orderedItem.items()})
+    # freqItems = [frozenset(x) for x in orderedItem]
+    # generateRules(freqItems, orderedItem)
